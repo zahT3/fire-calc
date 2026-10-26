@@ -8,11 +8,12 @@
   "scripts": {
     "test": "vitest run",
     "dev": "vite src/web",
-    "build": "vite build src/web --outDir ../../dist/web --emptyOutDir",
+    "build": "vite build src/web --outDir ../../dist/web --emptyOutDir --base /fire-calc/",
     "typecheck": "tsc -p tsconfig.json",
     "e2e": "playwright test",
     "og": "node scripts/make-og.mjs",
-    "build:cli": "vite build --ssr src/cli/main.ts --outDir dist/cli --emptyOutDir"
+    "build:cli": "vite build --ssr src/cli/main.ts --outDir dist/cli --emptyOutDir",
+    "preview": "vite preview src/web --outDir ../../dist/web --base /fire-calc/ --port 4173"
   },
   "license": "MIT",
   "type": "module",
