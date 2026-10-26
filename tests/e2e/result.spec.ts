@@ -66,3 +66,17 @@ test('自己算的重新开始保留输入，方格清空', async ({ page }) => 
   await expect(page.locator('#cellCount')).toHaveText('');
   await expect(page.getByText('视频示例')).toHaveCount(0);
 });
+
+test('不展开也能看到按 2% 实际回报算的数', async ({ page }) => {
+  await demo(page);
+  await expect(page.getByText('按 2% 实际回报算，需要 2,050 万。')).toBeVisible();
+});
+
+test('算不出数字时不提供分享图', async ({ page }) => {
+  await demo(page);
+  await page.getByText('这个数是怎么来的').click();
+  await page.fill('input[name=nominalReturn]', '2');
+  await expect(page.getByRole('button', { name: '分享图' })).toBeHidden();
+  await page.fill('input[name=nominalReturn]', '4.5');
+  await expect(page.getByRole('button', { name: '分享图' })).toBeVisible();
+});

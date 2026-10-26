@@ -37,6 +37,7 @@ function paint(root: HTMLElement, ctx: Ctx) {
   const rows = root.querySelector<HTMLElement>('#rows')!;
   root.querySelector<HTMLElement>('#nonPositive')!.hidden = r.ok;
   root.querySelector<HTMLElement>('#toProgress')!.hidden = !r.ok;
+  root.querySelector<HTMLElement>('#share')!.hidden = !r.ok;
   paintAssume(root, ctx);
   if (!r.ok) {
     rows.innerHTML = '';
