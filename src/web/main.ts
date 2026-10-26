@@ -4,7 +4,9 @@ import { formatMoney } from '../core/format';
 import { decodeLink, toUiText } from '../core/link';
 import type { FieldKey } from '../core/parse';
 import type { Locale } from '../core/types';
+import { renderBoard, flyInto, indexesOf } from './board';
 import { esc, makeT, type Ctx } from './ctx';
+import { countTo, prefersReducedMotion } from './motion';
 import { createStore, deriveInputs, firstUnanswered, initialState, STEPS, stepValid, type AppState } from './store';
 import { renderIntro } from './views/intro';
 import { renderQuestion } from './views/question';
@@ -38,21 +40,57 @@ function applyLink() {
 const stage = $('#stage');
 const ctx: Ctx = { store, t: makeT(store), go, confirm };
 
+// 只有"确认后自动切到的那一屏"需要防双击；用户自己点叠卡条、按返回打开的屏不受影响
+let guardUntil = 0;
+
 function go(patch: Partial<AppState>) {
+  guardUntil = 0;
   store.set(patch);
   const s = store.get();
   history.pushState({ view: s.view, step: s.step }, '');
   render();
 }
 
-function confirm() {
+// 一次确认只触发一次跳转；动画进行中的重复点击直接忽略
+let busy = false;
+let motion: AbortController | null = null;
+let counting = false;
+
+function confirm(from: DOMRect | null) {
+  if (busy || performance.now() < guardUntil) return;
   const s = store.get();
   const part = STEPS[s.step]!;
   if (!stepValid(s, part)) return;
+  const isNew = !s.answered.has(part);
+  const before = computeTarget(deriveInputs(s), [...s.answered]);
   store.set({ answered: new Set(s.answered).add(part) });
   const next = firstUnanswered(store.get());
-  if (next < 0) go({ view: 'result', resultSeen: true });
-  else go({ view: 'q', step: next });
+  // 双击的第二下会落在新一屏的"下一步"上，切过去后短暂忽略确认
+  busy = true;
+  const advance = () => {
+    if (next < 0) go({ view: 'result', resultSeen: true });
+    else go({ view: 'q', step: next });
+    busy = false;
+    guardUntil = performance.now() + 350;
+  };
+
+  const after = computeTarget(deriveInputs(store.get()), [...store.get().answered]);
+  if (!isNew || !from || prefersReducedMotion() || !after.ok) { advance(); return; }
+  const info = renderBoard($('#grid'), after.parts);
+  const targets = indexesOf(info.counts, part);
+  if (targets.length === 0) { advance(); return; }
+
+  ($('#next') as HTMLButtonElement).disabled = true;
+  motion?.abort();
+  motion = new AbortController();
+  const signal = motion.signal;
+  const color = getComputedStyle(document.documentElement).getPropertyValue(`--${part}`);
+  void flyInto(from, $('#grid'), targets, color, signal);
+  counting = true;
+  countTo($('#total'), before.ok ? before.total : 0, after.total, (n) => formatMoney(n, store.get().lang), signal);
+  setTimeout(() => { counting = false; }, 700);
+  $('#card').animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.9)', opacity: 0 }], { duration: 260, easing: 'ease-in', fill: 'forwards' });
+  setTimeout(advance, 240);
 }
 
 addEventListener('popstate', (e) => {
@@ -62,13 +100,25 @@ addEventListener('popstate', (e) => {
   render();
 });
 
-function header() {
+let lastUnit: number | null = null;
+
+function chrome() {
   const s = store.get();
   const r = computeTarget(deriveInputs(s), [...s.answered]);
   $('#brand').textContent = ctx.t('app.title');
   $('#totalLabel').textContent = ctx.t(s.view === 'q' ? 'top.running' : 'top.result');
-  $('#total').textContent = r.ok ? formatMoney(r.total, s.lang) : '—';
+  if (!counting) $('#total').textContent = r.ok ? formatMoney(r.total, s.lang) : '—';
   $('#lang').textContent = ctx.t('lang.switch');
+  if (s.view === 'intro' || !r.ok) return;
+  const info = renderBoard($('#grid'), r.parts);
+  const unitEl = $('#unit');
+  unitEl.textContent = ctx.t('board.unit', { v: formatMoney(info.unit, s.lang) });
+  $('#cellCount').textContent = info.cells ? ctx.t('board.cells', { n: info.cells }) : '';
+  if (lastUnit !== null && info.unit !== lastUnit && !prefersReducedMotion()) {
+    unitEl.classList.add('flash');
+    setTimeout(() => unitEl.classList.remove('flash'), 900);
+  }
+  lastUnit = info.unit;
 }
 
 function render() {
@@ -76,7 +126,7 @@ function render() {
   document.documentElement.lang = s.lang === 'zh' ? 'zh-CN' : 'en';
   document.title = ctx.t('app.title');
   document.body.dataset.view = s.view;
-  header();
+  chrome();
   if (s.view === 'intro') renderIntro(stage, ctx);
   else if (s.view === 'q') renderQuestion(stage, ctx);
   else stage.innerHTML = `<p class="hint">${esc(s.view)}</p>`;
@@ -86,6 +136,6 @@ $('#lang').addEventListener('click', () => {
   store.set({ lang: store.get().lang === 'zh' ? 'en' : 'zh' });
   render();
 });
-store.subscribe(header);
+store.subscribe(chrome);
 history.replaceState({ view: store.get().view, step: store.get().step }, '');
 render();
