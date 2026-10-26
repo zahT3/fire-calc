@@ -1,0 +1,21 @@
+{
+  "name": "fire-calc",
+  "version": "0.1.0",
+  "description": "你需要多少钱，才能财富自由？按小Lin说视频公式的计算器",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "dev": "vite src/web",
+    "build": "vite build src/web --outDir ../../dist/web --emptyOutDir"
+  },
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
