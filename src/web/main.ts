@@ -10,6 +10,7 @@ import { countTo, prefersReducedMotion } from './motion';
 import { createStore, deriveInputs, firstUnanswered, initialState, STEPS, stepValid, type AppState } from './store';
 import { renderIntro } from './views/intro';
 import { renderQuestion } from './views/question';
+import { renderResult } from './views/result';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 
@@ -37,11 +38,15 @@ function applyLink() {
   store.set({ answered, view: next < 0 ? 'result' : 'q', step: next < 0 ? 0 : next, resultSeen: next < 0 });
 }
 
-const stage = $('#stage');
-const ctx: Ctx = { store, t: makeT(store), go, confirm };
-
 // 只有"确认后自动切到的那一屏"需要防双击；用户自己点叠卡条、按返回打开的屏不受影响
 let guardUntil = 0;
+const stage = $('#stage');
+// 双击的第二下之前不会有别的操作；用户在新一屏上输入或点了别处，就不再是双击
+stage.addEventListener('input', () => { guardUntil = 0; });
+stage.addEventListener('click', (e) => {
+  if (!(e.target as HTMLElement).closest('#next')) guardUntil = 0;
+}, true);
+const ctx: Ctx = { store, t: makeT(store), go, confirm };
 
 function go(patch: Partial<AppState>) {
   guardUntil = 0;
@@ -109,7 +114,13 @@ function chrome() {
   $('#totalLabel').textContent = ctx.t(s.view === 'q' ? 'top.running' : 'top.result');
   if (!counting) $('#total').textContent = r.ok ? formatMoney(r.total, s.lang) : '—';
   $('#lang').textContent = ctx.t('lang.switch');
-  if (s.view === 'intro' || !r.ok) return;
+  if (s.view === 'intro') return;
+  if (!r.ok) {
+    $('#grid').innerHTML = '';
+    $('#unit').textContent = '';
+    $('#cellCount').textContent = '';
+    return;
+  }
   const info = renderBoard($('#grid'), r.parts);
   const unitEl = $('#unit');
   unitEl.textContent = ctx.t('board.unit', { v: formatMoney(info.unit, s.lang) });
@@ -129,6 +140,7 @@ function render() {
   chrome();
   if (s.view === 'intro') renderIntro(stage, ctx);
   else if (s.view === 'q') renderQuestion(stage, ctx);
+  else if (s.view === 'result') renderResult(stage, ctx);
   else stage.innerHTML = `<p class="hint">${esc(s.view)}</p>`;
 }
 

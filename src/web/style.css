@@ -104,3 +104,29 @@ body[data-view='intro'] .board { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* 结果页 */
+.result { flex: 1; display: flex; flex-direction: column; }
+.tag { align-self: flex-start; font-size: 12px; color: #000; background: var(--living); border-radius: 10px; padding: 2px 8px; margin-bottom: 8px; }
+.row { width: 100%; border: 0; background: none; display: flex; align-items: center; gap: 10px; font-size: 14px; padding: 9px 4px; color: #ccc; border-radius: 8px; text-align: left; -webkit-tap-highlight-color: transparent; }
+.row:hover, .row:active { background: #0e0e0e; }
+.row .op, .rsum .op { width: 12px; color: #555; text-align: center; flex: none; }
+.row .dot { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.row .label { min-width: 0; }
+.row .sym { display: block; font-size: 11px; color: #555; margin-top: 1px; }
+.row b { margin-left: auto; color: #fff; font-weight: 600; white-space: nowrap; }
+.row svg { flex: none; color: #3a3a3a; }
+.rsum { display: flex; align-items: baseline; gap: 10px; padding: 12px 22px 0 4px; margin-top: 6px; border-top: 1px solid #222; }
+.rsum .op { color: var(--living); }
+.rsum b { margin-left: auto; color: var(--living); font-size: 20px; white-space: nowrap; }
+.nonpos { margin-top: 8px; line-height: 1.6; color: #ddd; background: #111; border-radius: 12px; padding: 14px; }
+.basis { margin-top: 14px; font-size: 12px; color: #666; }
+.assume { margin-top: 10px; font-size: 13px; color: #ccc; line-height: 1.6; }
+.assume summary { color: var(--mute); cursor: pointer; list-style: none; width: fit-content; }
+.assume p { margin-top: 6px; }
+.assume__inputs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.assume__field { display: flex; align-items: center; gap: 6px; }
+.assume__field input { width: 64px; background: #1a1a1a; border: 1px solid transparent; border-radius: 6px; padding: 6px; text-align: right; }
+.assume__field input[aria-invalid='true'] { border-color: #ff6b4a; }
+.actions { display: flex; justify-content: center; flex-wrap: wrap; }
+.actions .btn { margin-top: 4px; padding: 12px 10px; font-size: 13px; }
