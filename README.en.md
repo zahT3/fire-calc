@@ -4,7 +4,7 @@
 
 A calculator built on the formula from the Bilibili video "[How much money do you need to be financially free?](https://www.bilibili.com/video/BV1yUHP6rEYD/)" by Xiao Lin Shuo. Answer 4 questions and get your own number.
 
-- Live: to be added after deployment
+- Live: https://zaht3.github.io/fire-calc/
 - Everything runs on your device. Nothing is uploaded; no analytics.
 
 The English version translates the interface only. Amounts are in CNY and the reference values are Chinese data.

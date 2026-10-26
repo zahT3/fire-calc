@@ -4,7 +4,7 @@
 
 一个按 B 站「小Lin说」视频《[你需要多少钱，才能财富自由？](https://www.bilibili.com/video/BV1yUHP6rEYD/)》里的公式做的计算器。回答 4 个问题，算出你自己的数。
 
-- 在线使用：部署后填写
+- 在线使用：https://zaht3.github.io/fire-calc/
 - 计算全部在你的设备上完成，不上传任何数据，没有统计和埋点。
 
 ## 公式
