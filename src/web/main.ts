@@ -6,6 +6,7 @@ import type { FieldKey } from '../core/parse';
 import type { Locale } from '../core/types';
 import { renderBoard, flyInto, indexesOf } from './board';
 import { makeT, type Ctx } from './ctx';
+import { syncUrl } from './share';
 import { countTo, prefersReducedMotion } from './motion';
 import { createStore, deriveInputs, firstUnanswered, initialState, STEPS, stepValid, type AppState } from './store';
 import { renderIntro } from './views/intro';
@@ -115,6 +116,7 @@ function chrome() {
   $('#totalLabel').textContent = ctx.t(s.view === 'q' ? 'top.running' : 'top.result');
   if (!counting) $('#total').textContent = r.ok ? formatMoney(r.total, s.lang) : '—';
   $('#lang').textContent = ctx.t('lang.switch');
+  syncUrl(s);
   if (s.view === 'intro') return;
   if (!r.ok) {
     $('#grid').innerHTML = '';

@@ -5,6 +5,7 @@ import type { MessageKey } from '../../i18n';
 import { esc, type Ctx } from '../ctx';
 import { deriveInputs, initialState, STEPS, type AppState } from '../store';
 import { assumeHTML, bindAssume } from './assume';
+import { copyLink, makeShareImage, shareUrl, showShareSheet } from '../share';
 
 const TAB_KEY: Record<PartKey, MessageKey> = { living: 'tab.living', kids: 'tab.kids', medical: 'tab.medical', house: 'tab.house' };
 const CHEVRON = '<svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -79,6 +80,23 @@ export function renderResult(root: HTMLElement, ctx: Ctx) {
 
   bindAssume(root, ctx, () => paint(root, ctx));
   root.querySelector('#toProgress')!.addEventListener('click', () => ctx.go({ view: 'progress' }));
+  root.querySelector('#share')!.addEventListener('click', async () => {
+    showShareSheet(await makeShareImage(ctx.store.get(), ctx), ctx);
+  });
+  root.querySelector('#copy')!.addEventListener('click', async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    const url = shareUrl(ctx.store.get());
+    if (await copyLink(url)) {
+      btn.textContent = t('result.copied');
+      setTimeout(() => { btn.textContent = t('result.copy'); }, 2000);
+      return;
+    }
+    // 内置浏览器常常不给剪贴板权限，退回到让用户自己复制
+    if (!root.querySelector('#linkBox')) {
+      root.querySelector('.actions')!.insertAdjacentHTML('afterend', `<label class="linkbox">${esc(t('result.copyFallback'))}<input id="linkBox" class="mono" readonly value="${esc(url)}"></label>`);
+    }
+    root.querySelector<HTMLInputElement>('#linkBox')!.select();
+  });
   root.querySelector('#restart')!.addEventListener('click', () => {
     const cur = ctx.store.get();
     // 从视频示例进来的清空，避免示例的数混进自己的计算；自己算的保留，方便微调重算

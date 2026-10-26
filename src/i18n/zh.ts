@@ -75,6 +75,12 @@ export const zh = {
   'result.copy': '复制链接',
   'result.copied': '链接已复制',
   'result.restart': '重新开始',
+  'result.copyFallback': '复制下面的链接',
+  'share.hint': '长按图片保存，或右键另存为',
+  'share.native': '分享…',
+  'share.download': '下载图片',
+  'share.close': '关闭',
+  'share.assume': '实际回报 {r}% · 乘数 {m}',
 
   'progress.title': '能拿来投资的钱有多少？',
   'progress.hint': '不含自住房',

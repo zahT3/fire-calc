@@ -77,6 +77,12 @@ export const en: Record<MessageKey, string> = {
   'result.copy': 'Copy link',
   'result.copied': 'Link copied',
   'result.restart': 'Start over',
+  'result.copyFallback': 'Copy this link',
+  'share.hint': 'Long-press the image to save it, or right-click and save',
+  'share.native': 'Share…',
+  'share.download': 'Download image',
+  'share.close': 'Close',
+  'share.assume': 'Real return {r}% · multiplier {m}',
 
   'progress.title': 'How much can you invest?',
   'progress.hint': 'Not counting the home you live in',
