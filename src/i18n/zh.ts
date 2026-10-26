@@ -75,6 +75,7 @@ export const zh = {
   'result.copy': '复制链接',
   'result.copied': '链接已复制',
   'result.restart': '重新开始',
+  'star.cta': '喜欢的话，去 GitHub 点个 ⭐',
   'result.copyFallback': '复制下面的链接',
   'share.hint': '长按图片保存，或右键另存为',
   'share.native': '分享…',

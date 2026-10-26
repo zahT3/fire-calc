@@ -159,3 +159,6 @@ body[data-view='intro'] .board { display: none; }
 .sheet__actions a { text-decoration: none; }
 .linkbox { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--mute); margin-top: 8px; }
 .linkbox input { background: #111; border: 1px solid #333; border-radius: 8px; padding: 8px; font-size: 12px; color: #ddd; }
+
+.star { display: block; text-align: center; margin-top: 6px; font-size: 12px; color: #666; text-decoration: none; }
+.star:hover { color: var(--living); }

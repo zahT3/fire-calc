@@ -50,3 +50,14 @@ test('元信息不含原型，带分享卡片', async ({ page }) => {
   await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute('content', 'summary_large_image');
   await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.png$/);
 });
+
+test('结果页和开场页有去 GitHub 点 Star 的链接', async ({ page }) => {
+  await page.goto('/');
+  const introLink = page.getByRole('link', { name: 'GitHub' });
+  await expect(introLink).toHaveAttribute('href', 'https://github.com/zahT3/fire-calc');
+  await page.getByRole('button', { name: '先用视频的例子看一遍' }).click();
+  const star = page.getByRole('link', { name: /去 GitHub 点个 ⭐/ });
+  await expect(star).toHaveAttribute('href', 'https://github.com/zahT3/fire-calc');
+  await expect(star).toHaveAttribute('target', '_blank');
+  await expect(star).toHaveAttribute('rel', /noopener/);
+});

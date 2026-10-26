@@ -77,6 +77,7 @@ export const en: Record<MessageKey, string> = {
   'result.copy': 'Copy link',
   'result.copied': 'Link copied',
   'result.restart': 'Start over',
+  'star.cta': 'Like it? Give it a ⭐ on GitHub',
   'result.copyFallback': 'Copy this link',
   'share.hint': 'Long-press the image to save it, or right-click and save',
   'share.native': 'Share…',

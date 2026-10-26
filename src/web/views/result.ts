@@ -3,6 +3,7 @@ import { formatBreakdown, formatMoney } from '../../core/format';
 import { PART_KEYS, type PartKey } from '../../core/types';
 import type { MessageKey } from '../../i18n';
 import { esc, type Ctx } from '../ctx';
+import { REPO_URL } from '../repo';
 import { deriveInputs, initialState, STEPS, type AppState } from '../store';
 import { assumeHTML, bindAssume } from './assume';
 import { copyLink, makeShareImage, shareUrl, showShareSheet } from '../share';
@@ -76,6 +77,7 @@ export function renderResult(root: HTMLElement, ctx: Ctx) {
         <button class="btn btn--ghost" id="copy">${esc(t('result.copy'))}</button>
         <button class="btn btn--ghost" id="restart">↺ ${esc(t('result.restart'))}</button>
       </div>
+      <a class="star" href="${REPO_URL}" target="_blank" rel="noopener">${esc(t('star.cta'))}</a>
     </section>`;
   paint(root, ctx);
 

@@ -1,5 +1,6 @@
 import { CN } from '../../regions/cn';
 import { esc, type Ctx } from '../ctx';
+import { REPO_URL } from '../repo';
 
 export function renderIntro(root: HTMLElement, ctx: Ctx) {
   const { t } = ctx;
@@ -13,7 +14,7 @@ export function renderIntro(root: HTMLElement, ctx: Ctx) {
       <div class="spacer"></div>
       <button class="btn btn--light" id="start">${esc(t('intro.start'))}</button>
       <button class="btn btn--ghost" id="demo">${esc(t('intro.demo'))}</button>
-      <p class="fine">${esc(t('intro.privacy'))} · <a href="${video.url}" target="_blank" rel="noopener">${esc(t('intro.video'))}</a></p>
+      <p class="fine">${esc(t('intro.privacy'))} · <a href="${video.url}" target="_blank" rel="noopener">${esc(t('intro.video'))}</a> · <a href="${REPO_URL}" target="_blank" rel="noopener">GitHub</a></p>
     </section>`;
   root.querySelector('#start')!.addEventListener('click', () => ctx.go({ view: 'q', step: 0, demo: false }));
   root.querySelector('#demo')!.addEventListener('click', () => {
