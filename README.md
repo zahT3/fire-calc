@@ -1,5 +1,7 @@
 # 你需要多少钱，才能财富自由？
 
+<p align="center"><img src="docs/demo.gif" width="320" alt="演示：回答四个问题，卡片碎成格子飞进方格"></p>
+
 [English](README.en.md)
 
 一个按 B 站「小Lin说」视频《[你需要多少钱，才能财富自由？](https://www.bilibili.com/video/BV1yUHP6rEYD/)》里的公式做的计算器。回答 4 个问题，算出你自己的数。

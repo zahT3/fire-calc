@@ -1,5 +1,7 @@
 # How much money do you need to be financially free?
 
+<p align="center"><img src="docs/demo.gif" width="320" alt="Demo: answer four questions and watch the cards break into the grid"></p>
+
 [中文](README.md)
 
 A calculator built on the formula from the Bilibili video "[How much money do you need to be financially free?](https://www.bilibili.com/video/BV1yUHP6rEYD/)" by Xiao Lin Shuo. Answer 4 questions and get your own number.

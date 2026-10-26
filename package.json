@@ -13,7 +13,8 @@
     "e2e": "playwright test",
     "og": "node scripts/make-og.mjs",
     "build:cli": "vite build --ssr src/cli/main.ts --outDir dist/cli --emptyOutDir",
-    "preview": "vite preview src/web --outDir ../../dist/web --base /fire-calc/ --port 4173"
+    "preview": "vite preview src/web --outDir ../../dist/web --base /fire-calc/ --port 4173",
+    "demo": "node scripts/record-demo.mjs"
   },
   "license": "MIT",
   "type": "module",
