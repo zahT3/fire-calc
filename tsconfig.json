@@ -9,7 +9,8 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["vitest/globals", "vite/client"]
   },
   "include": ["src", "tests", "scripts", "*.ts"]
 }

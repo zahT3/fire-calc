@@ -19,7 +19,7 @@ const LOCALES: readonly Locale[] = ['zh', 'en'];
 
 const clean = (n: number) => String(Number(n.toFixed(6)));
 
-function toUi(field: FieldKey, value: number): string {
+export function toUiText(field: FieldKey, value: number): string {
   if (field === 'monthlySpend' || field === 'kids') return clean(value);
   if (field === 'nominalReturn' || field === 'inflation') return clean(value * 100);
   return clean(value / 1e4);
@@ -29,16 +29,16 @@ export function encodeLink(s: LinkState): string {
   const q = new URLSearchParams({ v: VERSION });
   for (const [param, field] of NUMERIC) {
     const v = s.inputs[field];
-    if (typeof v === 'number') q.set(param, toUi(field, v));
+    if (typeof v === 'number') q.set(param, toUiText(field, v));
   }
   if (s.inputs.housing) q.set('hs', s.inputs.housing);
-  if (typeof s.assets === 'number') q.set('a', toUi('assets', s.assets));
+  if (typeof s.assets === 'number') q.set('a', toUiText('assets', s.assets));
   if (s.lang) q.set('lang', s.lang);
   if (s.demo) q.set('demo', '1');
   return q.toString();
 }
 
-export function decodeLink(search: string): LinkState {
+export function decodeLink(search: string): Partial<LinkState> {
   const q = new URLSearchParams(search.replace(/^\?/, ''));
   if (q.get('v') !== VERSION) return {};
 
