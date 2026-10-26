@@ -21,6 +21,7 @@
   "devDependencies": {
     "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.5",
+    "jsqr": "1.4.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.5",
     "vitest": "^5.0.5"
@@ -30,5 +31,8 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "dependencies": {
+    "uqr": "0.1.3"
   }
 }

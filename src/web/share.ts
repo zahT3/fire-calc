@@ -1,3 +1,4 @@
+import { encode } from 'uqr';
 import { computeTarget } from '../core/calc';
 import { allocateCells, pickUnit } from '../core/cells';
 import { formatBreakdown, formatMoney } from '../core/format';
@@ -45,8 +46,20 @@ export async function copyLink(url: string): Promise<boolean> {
 const FONT = '-apple-system, "PingFang SC", "Helvetica Neue", "Noto Sans SC", sans-serif';
 const MONO = 'ui-monospace, "SF Mono", Menlo, Consolas, monospace';
 
+// 白底留边，模块按整数像素画，被平台压缩后也容易扫
+function drawQr(g: CanvasRenderingContext2D, text: string, right: number, bottom: number, maxSize: number): number {
+  const qr = encode(text, { ecc: 'M', border: 2 });
+  const mod = Math.floor(maxSize / qr.size), size = mod * qr.size;
+  const x = right - size, y = bottom - size;
+  g.fillStyle = '#fff';
+  g.fillRect(x, y, size, size);
+  g.fillStyle = '#000';
+  qr.data.forEach((row, r) => row.forEach((dark, c) => { if (dark) g.fillRect(x + c * mod, y + r * mod, mod, mod); }));
+  return x;
+}
+
 export async function makeShareImage(s: AppState, ctx: Ctx): Promise<Blob> {
-  const W = 1080, H = 1350, PAD = 80;
+  const W = 1080, H = 1440, PAD = 80;
   const canvas = document.createElement('canvas');
   canvas.width = W;
   canvas.height = H;
@@ -99,16 +112,22 @@ export async function makeShareImage(s: AppState, ctx: Ctx): Promise<Blob> {
       g.textAlign = 'left';
       y += 54;
     }
-    g.fillStyle = '#8a8a8a';
-    g.font = `400 28px ${FONT}`;
-    g.fillText(ctx.t('share.assume', { r: Number((r.realReturn * 100).toFixed(2)), m: Math.round(r.multiplier) }), PAD, H - 150);
   }
+
+  // 二维码只放干净网址：扫进来的人从开场页开始算自己的，码也更稀疏好扫
+  const site = `${location.host}${location.pathname}`;
+  const qrLeft = drawQr(g, `${location.protocol}//${site}`, W - PAD, H - 60, 220);
+  const textW = qrLeft - PAD - 32;
+  g.fillStyle = '#fff';
+  g.font = `600 44px ${FONT}`;
+  g.fillText(ctx.t('share.scan'), PAD, H - 215, textW);
   g.fillStyle = '#8a8a8a';
   g.font = `400 28px ${FONT}`;
-  g.fillText(ctx.t('result.basis'), PAD, H - 105);
-  g.fillStyle = '#555';
+  if (r.ok) g.fillText(ctx.t('share.assume', { r: Number((r.realReturn * 100).toFixed(2)), m: Math.round(r.multiplier) }), PAD, H - 155, textW);
+  g.fillText(ctx.t('result.basis'), PAD, H - 110, textW);
+  g.fillStyle = '#777';
   g.font = `400 26px ${MONO}`;
-  g.fillText(`${location.host}${location.pathname}`, PAD, H - 62);
+  g.fillText(site, PAD, H - 64, textW);
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png'));
 }

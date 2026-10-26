@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import jsQR from 'jsqr';
 import { answerVideoExample } from './helpers';
 
 test('链接复现输入', async ({ page, browser }) => {
@@ -22,13 +23,22 @@ test('切换到英文后文案与金额格式变化，并写进链接', async ({
   expect(page.url()).toContain('lang=en');
 });
 
-test('分享图生成 1080×1350 的图片', async ({ page }) => {
+test('分享图生成 1080×1440 的图片，二维码扫出来是不带参数的网址', async ({ page, baseURL }) => {
   await page.goto('/');
   await page.getByRole('button', { name: '先用视频的例子看一遍' }).click();
   await page.getByRole('button', { name: '分享图' }).click();
   const img = page.locator('#shareImg');
   await expect(img).toBeVisible();
-  await expect.poll(() => img.evaluate((el: HTMLImageElement) => `${el.naturalWidth}x${el.naturalHeight}`)).toBe('1080x1350');
+  await expect.poll(() => img.evaluate((el: HTMLImageElement) => `${el.naturalWidth}x${el.naturalHeight}`)).toBe('1080x1440');
+  const { w, h, rgba } = await img.evaluate((el: HTMLImageElement) => {
+    const c = document.createElement('canvas');
+    c.width = el.naturalWidth;
+    c.height = el.naturalHeight;
+    const g = c.getContext('2d')!;
+    g.drawImage(el, 0, 0);
+    return { w: c.width, h: c.height, rgba: Array.from(g.getImageData(0, 0, c.width, c.height).data) };
+  });
+  expect(jsQR(Uint8ClampedArray.from(rgba), w, h)?.data).toBe(`${baseURL}/`);
   await page.getByRole('button', { name: '关闭' }).click();
   await expect(img).toHaveCount(0);
 });

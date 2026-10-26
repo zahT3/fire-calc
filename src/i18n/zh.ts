@@ -81,6 +81,7 @@ export const zh = {
   'share.native': '分享…',
   'share.download': '下载图片',
   'share.close': '关闭',
+  'share.scan': '扫码，算算你自己的',
   'share.assume': '实际回报 {r}% · 乘数 {m}',
 
   'progress.title': '能拿来投资的钱有多少？',

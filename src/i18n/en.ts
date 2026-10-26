@@ -83,6 +83,7 @@ export const en: Record<MessageKey, string> = {
   'share.native': 'Share…',
   'share.download': 'Download image',
   'share.close': 'Close',
+  'share.scan': 'Scan to work out yours',
   'share.assume': 'Real return {r}% · multiplier {m}',
 
   'progress.title': 'How much can you invest?',
