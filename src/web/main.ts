@@ -5,11 +5,12 @@ import { decodeLink, toUiText } from '../core/link';
 import type { FieldKey } from '../core/parse';
 import type { Locale } from '../core/types';
 import { renderBoard, flyInto, indexesOf } from './board';
-import { esc, makeT, type Ctx } from './ctx';
+import { makeT, type Ctx } from './ctx';
 import { countTo, prefersReducedMotion } from './motion';
 import { createStore, deriveInputs, firstUnanswered, initialState, STEPS, stepValid, type AppState } from './store';
 import { renderIntro } from './views/intro';
 import { renderQuestion } from './views/question';
+import { progressFor, renderProgress } from './views/progress';
 import { renderResult } from './views/result';
 
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
@@ -121,7 +122,8 @@ function chrome() {
     $('#cellCount').textContent = '';
     return;
   }
-  const info = renderBoard($('#grid'), r.parts);
+  const lit = s.view === 'progress' ? progressFor(s)?.lit ?? null : null;
+  const info = renderBoard($('#grid'), r.parts, { lit });
   const unitEl = $('#unit');
   unitEl.textContent = ctx.t('board.unit', { v: formatMoney(info.unit, s.lang) });
   $('#cellCount').textContent = info.cells ? ctx.t('board.cells', { n: info.cells }) : '';
@@ -141,7 +143,7 @@ function render() {
   if (s.view === 'intro') renderIntro(stage, ctx);
   else if (s.view === 'q') renderQuestion(stage, ctx);
   else if (s.view === 'result') renderResult(stage, ctx);
-  else stage.innerHTML = `<p class="hint">${esc(s.view)}</p>`;
+  else renderProgress(stage, ctx);
 }
 
 $('#lang').addEventListener('click', () => {

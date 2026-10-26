@@ -1,10 +1,10 @@
 import { computeTarget } from '../../core/calc';
 import { formatBreakdown, formatMoney } from '../../core/format';
-import type { FieldKey } from '../../core/parse';
 import { PART_KEYS, type PartKey } from '../../core/types';
 import type { MessageKey } from '../../i18n';
 import { esc, type Ctx } from '../ctx';
-import { deriveInputs, errorFor, initialState, STEPS, type AppState } from '../store';
+import { deriveInputs, initialState, STEPS, type AppState } from '../store';
+import { assumeHTML, bindAssume } from './assume';
 
 const TAB_KEY: Record<PartKey, MessageKey> = { living: 'tab.living', kids: 'tab.kids', medical: 'tab.medical', house: 'tab.house' };
 const CHEVRON = '<svg width="8" height="12" viewBox="0 0 8 12" aria-hidden="true"><path d="M1.5 1.5 6 6l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -20,6 +20,15 @@ function rowLabel(s: AppState, part: PartKey, ctx: Ctx): string {
   return ctx.t(i.housing === 'buy' ? 'result.house' : i.housing === 'own' ? 'result.houseOwn' : 'result.houseRent');
 }
 
+export function paintAssume(root: HTMLElement, ctx: Ctx) {
+  const s = ctx.store.get();
+  const inputs = deriveInputs(s);
+  const r = computeTarget(inputs);
+  root.querySelector('#assumeBody')!.textContent = r.ok ? ctx.t('result.assumeBody', { r: pct(r.realReturn), m: Math.round(r.multiplier) }) : '';
+  const atTwo = r.ok ? r.total - r.parts.living + 600 * inputs.monthlySpend : 0;
+  root.querySelector('#alt')!.textContent = r.ok && Math.abs(r.realReturn - 0.02) > 1e-9 ? ctx.t('result.alt', { v: formatMoney(atTwo, s.lang) }) : '';
+}
+
 function paint(root: HTMLElement, ctx: Ctx) {
   const s = ctx.store.get();
   const inputs = deriveInputs(s);
@@ -27,10 +36,9 @@ function paint(root: HTMLElement, ctx: Ctx) {
   const rows = root.querySelector<HTMLElement>('#rows')!;
   root.querySelector<HTMLElement>('#nonPositive')!.hidden = r.ok;
   root.querySelector<HTMLElement>('#toProgress')!.hidden = !r.ok;
+  paintAssume(root, ctx);
   if (!r.ok) {
     rows.innerHTML = '';
-    root.querySelector('#assumeBody')!.textContent = '';
-    root.querySelector('#alt')!.textContent = '';
     return;
   }
   const f = formatBreakdown(r.parts, r.total, s.lang);
@@ -46,16 +54,6 @@ function paint(root: HTMLElement, ctx: Ctx) {
       <b class="mono">${f.approx ? esc(ctx.t('result.approx')) + ' ' : ''}${esc(f.total)}</b></div>`;
   rows.querySelectorAll<HTMLButtonElement>('[data-goto]').forEach((b) =>
     b.addEventListener('click', () => ctx.go({ view: 'q', step: Number(b.dataset.goto) })));
-
-  root.querySelector('#assumeBody')!.textContent = ctx.t('result.assumeBody', { r: pct(r.realReturn), m: Math.round(r.multiplier) });
-  const atTwo = r.total - r.parts.living + 600 * inputs.monthlySpend;
-  root.querySelector('#alt')!.textContent = Math.abs(r.realReturn - 0.02) > 1e-9 ? ctx.t('result.alt', { v: formatMoney(atTwo, s.lang) }) : '';
-}
-
-function assumeInput(s: AppState, ctx: Ctx, key: FieldKey, label: MessageKey): string {
-  const err = errorFor(s, key);
-  return `<label class="assume__field">${esc(ctx.t(label))}
-    <input class="mono" name="${key}" inputmode="decimal" value="${esc(s.text[key] ?? '')}" aria-invalid="${!!err}"> %</label>`;
 }
 
 export function renderResult(root: HTMLElement, ctx: Ctx) {
@@ -68,12 +66,7 @@ export function renderResult(root: HTMLElement, ctx: Ctx) {
       <div id="rows"></div>
       <p class="nonpos" id="nonPositive" role="status" hidden>${esc(t('result.nonPositive'))}</p>
       <p class="basis">${esc(t('result.basis'))}</p>
-      <details class="assume">
-        <summary>${esc(t('result.assume'))} ⓘ</summary>
-        <p id="assumeBody"></p><p id="alt"></p>
-        <div class="assume__inputs">${assumeInput(s, ctx, 'nominalReturn', 'result.return')} −
-          ${assumeInput(s, ctx, 'inflation', 'result.inflation')}</div>
-      </details>
+      ${assumeHTML(s, ctx)}
       <div class="spacer"></div>
       <button class="btn btn--light" id="toProgress">${esc(t('result.toProgress'))}</button>
       <div class="actions">
@@ -84,11 +77,7 @@ export function renderResult(root: HTMLElement, ctx: Ctx) {
     </section>`;
   paint(root, ctx);
 
-  root.querySelectorAll<HTMLInputElement>('.assume input').forEach((inp) => inp.addEventListener('input', () => {
-    ctx.store.set({ text: { ...ctx.store.get().text, [inp.name]: inp.value } });
-    inp.setAttribute('aria-invalid', String(!!errorFor(ctx.store.get(), inp.name as FieldKey)));
-    paint(root, ctx);
-  }));
+  bindAssume(root, ctx, () => paint(root, ctx));
   root.querySelector('#toProgress')!.addEventListener('click', () => ctx.go({ view: 'progress' }));
   root.querySelector('#restart')!.addEventListener('click', () => {
     const cur = ctx.store.get();

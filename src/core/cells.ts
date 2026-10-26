@@ -38,10 +38,11 @@ export function allocateCells(parts: Breakdown, unit: number): { counts: Breakdo
 export function progressCells(assets: number, total: number, cells: number): { lit: number; reached: boolean; percent: number } {
   const reached = assets >= total;
   if (reached) return { lit: cells, reached, percent: 100 };
-  const ratio = Math.max(assets, 0) / total;
+  // 先乘后除，避免 1000 万 ÷ 1870 万 × 187 因浮点误差少算一格
+  const a = Math.max(assets, 0);
   return {
-    lit: Math.max(0, Math.min(cells - 1, Math.floor(ratio * cells))),
+    lit: Math.max(0, Math.min(cells - 1, Math.floor((a * cells) / total))),
     reached,
-    percent: Math.min(99, Math.floor(ratio * 100)),
+    percent: Math.min(99, Math.floor((a * 100) / total)),
   };
 }

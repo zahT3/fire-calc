@@ -54,3 +54,10 @@ test('预留等于 / 超过资产', () => {
 test('反算在实际回报 ≤ 0 时返回错误', () => {
   expect(monthlyAffordable(6_000_000, { ...video, nominalReturn: 0.02 })).toEqual({ ok: false, reason: 'non-positive-real-return' });
 });
+
+test('默认假设下乘数精确等于 480，资产刚好够时没有浮点尾差', () => {
+  const r = computeTarget(video);
+  expect(r.ok && r.multiplier).toBe(480);
+  const rent = computeTarget({ ...video, monthlySpend: 10000, kids: 1, perKid: 700_000, medical: 500_000, housing: 'rent' });
+  expect(rent.ok && rent.total).toBe(6_000_000);
+});

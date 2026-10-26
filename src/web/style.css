@@ -130,3 +130,19 @@ body[data-view='intro'] .board { display: none; }
 .assume__field input[aria-invalid='true'] { border-color: #ff6b4a; }
 .actions { display: flex; justify-content: center; flex-wrap: wrap; }
 .actions .btn { margin-top: 4px; padding: 12px 10px; font-size: 13px; }
+
+/* 我现在有多少 */
+.progress { flex: 1; display: flex; flex-direction: column; }
+.progress h2 { font-size: 24px; font-weight: 700; line-height: 1.25; }
+.progress .field { color: #fff; }
+.progress .err { color: #ff8a6b; }
+.progress .chip { background: #1a1a1a; color: #ccc; }
+.progress .chip[aria-pressed='true'] { background: #fff; color: #000; }
+.progress__line { margin-top: 18px; font-size: 14px; }
+.bar { height: 5px; background: #1a1a1a; border-radius: 3px; margin-top: 8px; }
+.bar i { display: block; height: 5px; border-radius: 3px; background: #fff; width: 0; transition: width 0.4s; }
+.progress__gap { margin-top: 12px; font-size: 18px; font-weight: 700; }
+.progress__afford { margin-top: 6px; font-size: 14px; line-height: 1.6; color: #ccc; }
+/* 点亮用中性的白色描边表示，不暗示哪一项已经备足 */
+.grid i.dim { opacity: 0.14; }
+.grid i.lit { box-shadow: inset 0 0 0 1.5px #fff; }
