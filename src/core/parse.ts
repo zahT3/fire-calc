@@ -44,7 +44,8 @@ export function parseField(field: FieldKey, text: string): Parsed {
   if (!NUMBER.test(s)) return { ok: false, error: 'invalid' };
   const n = Number(s.replace(/,/g, ''));
   if (unit === 'count' && !Number.isInteger(n)) return { ok: false, error: 'invalid' };
-  const value = n * scale;
+  // 百分数用除法，避免 4.5 × 0.01 得到 0.045000000000000005
+  const value = unit === 'percent' ? n / 100 : n * scale;
   if (!Number.isFinite(value)) return { ok: false, error: 'invalid' };
   if (negative && value !== 0) return { ok: false, error: 'negative' };
   if (value > LIMITS[field]) return { ok: false, error: 'too-large' };
