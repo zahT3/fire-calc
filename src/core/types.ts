@@ -1,6 +1,8 @@
 // 金额一律用元；回报率、通胀用小数（0.045 = 4.5%）
 export type Housing = 'own' | 'rent' | 'buy';
 
+export type Locale = 'zh' | 'en';
+
 export type PartKey = 'living' | 'kids' | 'medical' | 'house';
 export const PART_KEYS: readonly PartKey[] = ['living', 'kids', 'medical', 'house'];
 
