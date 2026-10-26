@@ -96,6 +96,7 @@ body[data-view='intro'] .board { display: none; }
   .stage { grid-column: 1; grid-row: 2; margin-top: 28px; }
   .board { grid-column: 2; grid-row: 2; margin-top: 28px; align-self: start; }
   .sum__value { font-size: 44px; }
+  .brand { max-width: none; font-size: 14px; }
   body[data-view='intro'] .stage { grid-column: 1 / 3; max-width: 560px; }
 }
 

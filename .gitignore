@@ -3,3 +3,4 @@ dist/
 .superpowers/
 test-results/
 playwright-report/
+tests/e2e/__shots__/

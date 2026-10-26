@@ -108,6 +108,13 @@ addEventListener('popstate', (e) => {
 });
 
 let lastUnit: number | null = null;
+let liveTimer = 0;
+
+// 读屏只播报稳定后的总额，不逐帧念滚动中的数字
+function announce(text: string) {
+  clearTimeout(liveTimer);
+  liveTimer = window.setTimeout(() => { if ($('#live').textContent !== text) $('#live').textContent = text; }, 400);
+}
 
 function chrome() {
   const s = store.get();
@@ -117,6 +124,7 @@ function chrome() {
   if (!counting) $('#total').textContent = r.ok ? formatMoney(r.total, s.lang) : '—';
   $('#lang').textContent = ctx.t('lang.switch');
   syncUrl(s);
+  if (s.view === 'result' || s.view === 'progress') announce(r.ok ? `${ctx.t('top.result')} ${formatMoney(r.total, s.lang)}` : ctx.t('result.nonPositive'));
   if (s.view === 'intro') return;
   if (!r.ok) {
     $('#grid').innerHTML = '';
